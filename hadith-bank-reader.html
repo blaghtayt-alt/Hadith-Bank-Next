@@ -882,7 +882,7 @@ body[data-theme="dark"] .narration .source-glyph,body[data-theme="dark"] .result
     const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),30000);try{
       const response=await nativeFetch(exactURL,{credentials:'same-origin',redirect:'error',cache:'no-store',signal:ctrl.signal});
       if(!response.ok || response.redirected || response.url!==exactURL)throw fail('manifest request rejected (HTTP '+response.status+')');
-      const declared=response.headers.get('content-length');if(declared!==null && (!/^\d+$/.test(declared)||Number(declared)!==MANIFEST_BYTES))throw fail('manifest header length mismatch');
+      const declared=response.headers.get('content-length'),encoded=response.headers.get('content-encoding');if(!encoded && declared!==null && (!/^\d+$/.test(declared)||Number(declared)!==MANIFEST_BYTES))throw fail('manifest header length mismatch');
       const data=await readBounded(response,MANIFEST_BYTES);if(await digest(data)!==MANIFEST_SHA)throw fail('manifest checksum mismatch');
       let value;try{value=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(data))}catch(_){throw fail('manifest is not valid UTF-8 JSON')}
       if(!value || value.schema!=='hab-split-release-v1' || value.release_id!==ID || value.release_root!==ROOT || value.source_commit!==SOURCE || value.source_records_sha256!==RECORDS || value.input_inventory_sha256!==INPUT || !Array.isArray(value.rows) || value.rows.length!==ROW_COUNT)throw fail('manifest schema or cohort mismatch');
@@ -906,7 +906,7 @@ body[data-theme="dark"] .narration .source-glyph,body[data-theme="dark"] .result
     const target=resolve(input);
     const response=await nativeFetch(target,{...options,credentials:'same-origin',redirect:'error'});
     if(response.redirected || response.url!==target)throw fail('redirected or wrong data URL');
-    const declared=response.headers.get('content-length');if(response.ok && declared!==null && (!/^\d+$/.test(declared)||Number(declared)!==row.wire_bytes))throw fail('data length header mismatch');
+    const declared=response.headers.get('content-length'),encoded=response.headers.get('content-encoding');if(!encoded && response.ok && declared!==null && (!/^\d+$/.test(declared)||Number(declared)!==row.wire_bytes))throw fail('data length header mismatch');
     if(!response.ok)throw fail('data request rejected (HTTP '+response.status+')');const checked=await readBounded(response.clone(),row.wire_bytes);if(await digest(checked)!==row.wire_sha256)throw fail('data checksum mismatch');
     return response;
   }
