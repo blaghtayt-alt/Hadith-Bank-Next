@@ -887,7 +887,7 @@ body[data-theme="dark"] .narration .source-glyph,body[data-theme="dark"] .result
     if(parent)parent.addEventListener('abort',relay,{once:true});
     try{const response=await nativeFetch(target,{...options,signal:ctrl.signal,credentials:'same-origin',redirect:'error'});
       if(!response.ok||response.redirected||response.url!==target)throw fail('data request rejected (HTTP '+response.status+')');
-      const declared=response.headers.get('content-length'),encoded=response.headers.get('content-encoding');if(!encoded&&declared!==null&&(!/^\d+$/.test(declared)||Number(declared)!==size))throw fail('data length header mismatch');
+      // Browser-visible Content-Length may describe compressed transport; validate the decoded body below.
       const bytes=await readBounded(response.clone(),size);if(await digest(bytes)!==expected)throw fail('data checksum mismatch');return response;
     }finally{clearTimeout(timer);if(parent)parent.removeEventListener('abort',relay)}
   }
