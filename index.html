@@ -867,6 +867,7 @@ body[data-theme="dark"] .narration .source-glyph,body[data-theme="dark"] .result
   'use strict';
   const ORIGIN="https://blaghtayt-alt.github.io", ID="410f3549e01c5c8b1b2f187d2053c2e2a1e2af0cde8e0166380dd09f3f2a1ee8", ROOT="/Hadith-Bank-data/releases/410f3549e01c5c8b1b2f187d2053c2e2a1e2af0cde8e0166380dd09f3f2a1ee8/", MANIFEST_SHA="6b7175837a791d02e75099eff4bc0a59a2e7289a54a90c30b919889cd4d070d0", MANIFEST_BYTES=1666478, ROW_COUNT=2185, SOURCE="1a865c6c3585815ea4132b96b69240f5ed3a6635", RECORDS="4929aa1b06d0dd8794aa92bfda50631ddda03d544fb4988e418da1aeec7054c6", INPUT="c2f224e0141e32f6fde528880bd01f765c3fed09a2206979bed6f0c38282f03d";
   const ALLOWED_SCHEMAS={"annotations":["hadith-bank-reader-lazy-v2:annotations"],"details":["hadith-bank-reader-lazy-v2:details"],"directory":["hadith-bank-reader-lazy-v2:directory"],"discovery":["hadith-bank-discovery-v1","hadith-bank-discovery-v1-postings","hadith-bank-discovery-v1-previews"],"manifest":["hadith-bank-reader-lazy-v2"],"search":["hadith-bank-reader-lazy-v2:search"]};
+  const RAW='https://raw.githubusercontent.com', RAW_COMMIT='2f0a3396e2629b3ac71b1324df7fbea75a82150f';
   const LEGACY='https://blaghtayt-alt.github.io', SIBLING='https://blaghtayt-alt.github.io', MAP64="/////+b+H8x+/uGB/////////v+/9////Pf////26dg///////f///7//u///9+//v//19///////+//yqJHu71u/2F///+/7///////cf9v7e1278//fJf//7u96//9/y////+oe8/v3/c+Zr+x2jnz/75/37fzwu//////////7/9r/zDh6fFse/2HzR75/fP6W///wkQykSZABASIIAaIgBKkBAgHACEABf39/6/p/+7j/v/vp99O//1P/z3//fzv/x+vf/0//79z2/fH+lp/v91XyxY/+f//Nq/3/e+9vfs1////////PX/////f/////7/3/////X//5v/9//96/33/9X///P///X///5u7gA==", MAP_SHA="b49f91634bf6dd11475f2377bcc26a9a0e3bb853eb1d8d963b28558a9185fec1";
   const OLD='/Hadith-Bank-Next/hadith-bank-reader-data/', nativeFetch=window.fetch.bind(window), hex=/^[0-9a-f]{64}$/;
   const fail=message=>new Error('Split data integrity: '+message);
@@ -878,15 +879,29 @@ body[data-theme="dark"] .narration .source-glyph,body[data-theme="dark"] .result
   const safePath=p=>typeof p==='string'&&/^hadith-bank-reader-data\/[A-Za-z0-9_./-]+$/.test(p)&&p.split('/').every(s=>s&&s!=='.'&&s!=='..');
   function resolvePath(input){if(configIssue)throw fail(configIssue);let u;try{u=new URL(input,location.href)}catch(_){throw fail('invalid data URL')}if(u.origin!==ORIGIN || u.username || u.password || u.search || u.hash || !u.pathname.startsWith(OLD))throw fail('untrusted original data URL');const rel=u.pathname.slice('/Hadith-Bank-Next/'.length);if(!safePath(rel))throw fail('unsafe data path');return rel}
   function resolve(input){const rel=resolvePath(input);if(!resolvedRoutes)throw fail('manifest not loaded');const row=resolvedRoutes.get(rel);if(!row)throw fail('path missing from manifest');return new URL(row.reuse?row.old_url_path:row.new_url_path,row.reuse?LEGACY:SIBLING).href}
+  function fallbackURL(row){if(!row || !row.new_url_path.startsWith(ROOT))throw fail('unsafe fallback row');return RAW+'/blaghtayt-alt/Hadith-Bank-data/'+RAW_COMMIT+'/objects/'+row.wire_sha256}
+  function responseMatches(input,actual){const rel=resolvePath(input),row=resolvedRoutes&&resolvedRoutes.get(rel);return Boolean(row&&(actual===resolve(input)||actual===fallbackURL(row)))}
+  async function checkedFetch(target,options,size,expected){
+    const parent=options.signal,ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),30000),relay=()=>ctrl.abort();
+    if(parent&&parent.aborted){clearTimeout(timer);throw new DOMException('Aborted','AbortError')}
+    if(parent)parent.addEventListener('abort',relay,{once:true});
+    try{const response=await nativeFetch(target,{...options,signal:ctrl.signal,credentials:'same-origin',redirect:'error'});
+      if(!response.ok||response.redirected||response.url!==target)throw fail('data request rejected (HTTP '+response.status+')');
+      const declared=response.headers.get('content-length'),encoded=response.headers.get('content-encoding');if(!encoded&&declared!==null&&(!/^\d+$/.test(declared)||Number(declared)!==size))throw fail('data length header mismatch');
+      const bytes=await readBounded(response.clone(),size);if(await digest(bytes)!==expected)throw fail('data checksum mismatch');return response;
+    }finally{clearTimeout(timer);if(parent)parent.removeEventListener('abort',relay)}
+  }
+  async function fetchWithFallback(primary,backup,options,size,expected){
+    try{return await checkedFetch(primary,options,size,expected)}
+    catch(e){if(options.signal&&options.signal.aborted)throw new DOMException('Aborted','AbortError');return await checkedFetch(backup,options,size,expected)}
+  }
   async function loadManifest(){
-    const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),30000);try{
-      const response=await nativeFetch(exactURL,{credentials:'same-origin',redirect:'error',cache:'no-store',signal:ctrl.signal});
-      if(!response.ok || response.redirected || response.url!==exactURL)throw fail('manifest request rejected (HTTP '+response.status+')');
-      const declared=response.headers.get('content-length'),encoded=response.headers.get('content-encoding');if(!encoded && declared!==null && (!/^\d+$/.test(declared)||Number(declared)!==MANIFEST_BYTES))throw fail('manifest header length mismatch');
-      const data=await readBounded(response,MANIFEST_BYTES);if(await digest(data)!==MANIFEST_SHA)throw fail('manifest checksum mismatch');
+    const backup=RAW+'/blaghtayt-alt/Hadith-Bank-data/'+RAW_COMMIT+'/objects/'+MANIFEST_SHA;
+    const response=await fetchWithFallback(exactURL,backup,{cache:'no-store'},MANIFEST_BYTES,MANIFEST_SHA);
+    const data=new Uint8Array(await response.arrayBuffer());
       let value;try{value=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(data))}catch(_){throw fail('manifest is not valid UTF-8 JSON')}
       if(!value || value.schema!=='hab-split-release-v1' || value.release_id!==ID || value.release_root!==ROOT || value.source_commit!==SOURCE || value.source_records_sha256!==RECORDS || value.input_inventory_sha256!==INPUT || !Array.isArray(value.rows) || value.rows.length!==ROW_COUNT)throw fail('manifest schema or cohort mismatch');
-      const bits=Uint8Array.from(atob(MAP64),c=>c.charCodeAt(0));if(bits.length!==Math.ceil(ROW_COUNT/8)||await digest(bits)!==MAP_SHA||(bits[bits.length-1]&7)!==0)throw fail('reuse map integrity');let rowIndex=0,shared=0;
+      const bits=Uint8Array.from(atob(MAP64),c=>c.charCodeAt(0));if(bits.length!==Math.ceil(ROW_COUNT/8)||await digest(bits)!==MAP_SHA||(bits[bits.length-1]&127)!==0)throw fail('reuse map integrity');let rowIndex=0,shared=0;
       const map=new Map(),kinds=new Set(['manifest','directory','search','annotations','details','discovery']);
       for(const row of value.rows){
         if(!row || !safePath(row.path) || !kinds.has(row.kind) || row.old_url_path!=='/Hadith-Bank/'+row.path || row.new_url_path!==ROOT+row.path || !hex.test(row.wire_sha256) || !Number.isSafeInteger(row.wire_bytes) || row.wire_bytes<1 || !Number.isSafeInteger(row.decoded_bytes) || row.decoded_bytes<1 || !Number.isSafeInteger(row.item_count) || row.item_count<0 || typeof row.payload_schema!=='string' || !row.payload_schema || row.source_records_sha256!==RECORDS || map.has(row.path))throw fail('unsafe or duplicate manifest entry');
@@ -895,7 +910,6 @@ body[data-theme="dark"] .narration .source-glyph,body[data-theme="dark"] .result
         const reuse=Boolean(bits[rowIndex>>3]&(128>>(rowIndex&7)));rowIndex++;if(reuse)shared++;map.set(row.path,Object.freeze({...row,reuse}));
       }
       if(rowIndex!==ROW_COUNT||shared!==1716)throw fail('reuse map cohort mismatch');resolvedRoutes=map;return map;
-    }finally{clearTimeout(timer)}
   }
   function getManifest(){if(!manifestFlight){const current=loadManifest();manifestFlight=current;current.catch(()=>{if(manifestFlight===current)manifestFlight=null})}return manifestFlight}
   async function withAbort(promise,signal){if(!signal)return promise;if(signal.aborted)throw new DOMException('Aborted','AbortError');return new Promise((resolvePromise,reject)=>{const abort=()=>reject(new DOMException('Aborted','AbortError'));signal.addEventListener('abort',abort,{once:true});promise.then(x=>{signal.removeEventListener('abort',abort);resolvePromise(x)},e=>{signal.removeEventListener('abort',abort);reject(e)})})}
@@ -903,14 +917,9 @@ body[data-theme="dark"] .narration .source-glyph,body[data-theme="dark"] .result
     const rel=resolvePath(input),map=await withAbort(getManifest(),options.signal),row=map.get(rel);
     if(!row || !descriptor || descriptor.path!==rel || descriptor.sha256!==row.wire_sha256 || descriptor.bytes!==row.wire_bytes || descriptor.uncompressed_bytes!==row.decoded_bytes || (descriptor.uncompressed_sha256 && descriptor.uncompressed_sha256!==row.decoded_sha256) || (descriptor.schema && row.kind==='discovery' && descriptor.schema!==row.payload_schema))throw fail('reader descriptor differs from release manifest');
     const count=Number.isSafeInteger(descriptor.count)?descriptor.count:descriptor.record_count;if(count!==row.item_count)throw fail('reader descriptor count differs from release manifest');
-    const target=resolve(input);
-    const response=await nativeFetch(target,{...options,credentials:'same-origin',redirect:'error'});
-    if(response.redirected || response.url!==target)throw fail('redirected or wrong data URL');
-    const declared=response.headers.get('content-length'),encoded=response.headers.get('content-encoding');if(!encoded && response.ok && declared!==null && (!/^\d+$/.test(declared)||Number(declared)!==row.wire_bytes))throw fail('data length header mismatch');
-    if(!response.ok)throw fail('data request rejected (HTTP '+response.status+')');const checked=await readBounded(response.clone(),row.wire_bytes);if(await digest(checked)!==row.wire_sha256)throw fail('data checksum mismatch');
-    return response;
+    return await fetchWithFallback(resolve(input),fallbackURL(row),options,row.wire_bytes,row.wire_sha256);
   }
-  Object.defineProperties(window,{HadithSplitResolve:{value:resolve,writable:false,configurable:false},HadithSplitFetch:{value:splitFetch,writable:false,configurable:false}});
+  Object.defineProperties(window,{HadithSplitResolve:{value:resolve,writable:false,configurable:false},HadithSplitResponseMatches:{value:responseMatches,writable:false,configurable:false},HadithSplitFetch:{value:splitFetch,writable:false,configurable:false}});
 })();
 
 /* Bounded, source-preserving reader transport. No full-record cache is kept. */
@@ -1119,7 +1128,7 @@ body[data-theme="dark"] .narration .source-glyph,body[data-theme="dark"] .result
         const url=urls.get(part.path);
         const response=await waitFor(fetcher(url,{credentials:"same-origin",redirect:"error",signal},part),signal);
         if(!response || !response.ok || response.redirected)throw error("shard request failed" + (response?" (HTTP "+response.status+")":""));
-        if(response.url && response.url!==root.HadithSplitResolve(url))throw error("unexpected shard response URL");
+        if(response.url && !root.HadithSplitResponseMatches(url,response.url))throw error("unexpected shard response URL");
         const declared=response.headers && response.headers.get("content-length");
         if(declared!==null && declared!==undefined && (!/^\d+$/.test(declared) || Number(declared)!==part.bytes))throw error("compressed content length does not match manifest");
         const compressed=await readBounded(response.body,part.bytes,signal,"compressed shard");
