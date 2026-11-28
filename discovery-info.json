@@ -1,17 +1,17 @@
 {
   "schema": "hadith-bank-discovery-v1",
-  "record_pages": 41121,
+  "record_pages": 41122,
   "shared_reader_occurrences": 73789,
   "index_pages": 1496,
-  "indexable_pages": 42617,
-  "generated_files": 43308,
-  "generated_bytes": 499588638,
-  "site_bytes": 931101177,
-  "source_records_sha256": "bafe4fe6993cec7b36cf27794c27a15d6bed56e15be4f386890a168820bb60fa",
+  "indexable_pages": 42618,
+  "generated_files": 43309,
+  "generated_bytes": 499596209,
+  "site_bytes": 931112524,
+  "source_records_sha256": "a25c6c651f7be3a9dbb924765753bb2d7406a23b13122a5bb4a72aaf29b51ec5",
   "source_texts_unchanged": true,
   "independent_qc_performed": false,
-  "static_record_pages_dom_verified": 41121,
-  "static_record_body_bytes_saved": 7965460,
+  "static_record_pages_dom_verified": 41122,
+  "static_record_body_bytes_saved": 7965698,
   "complete_source_views": {
     "provider_occurrences": 36464,
     "original_source_pages": 238,
@@ -39,7 +39,7 @@
     "ja": 3520,
     "ms": 147,
     "pt": 8,
-    "ur": 234,
+    "ur": 235,
     "uz": 9780,
     "vi": 4555,
     "zh-CN": 10835
@@ -48,13 +48,13 @@
   "book_language_count": 137,
   "edition_count": 272,
   "sitemap_count": 2,
-  "sitemap_url_count": 42618,
+  "sitemap_url_count": 42619,
   "sitemap": "https://blaghtayt-alt.github.io/Hadith-Bank/sitemap.xml",
   "sitemap_original_xml_sha256": [
-    "04c1e07498a96b6e9eff309114d0d81e91e96c0e7d4efe1a76b1230ab973bff8",
-    "d8967b50af398093205597708231f599a0e1467e23a99e286b7a1c08ae7b40db"
+    "5cc9914c785960ea195e5aa6b3a28b2f6fd0e105e54af2ec98c55d0c6944f91d",
+    "6a36098fa6d1cef6da40aeffe28fa23f90e4320e1d22d8e8fdcc66a950001022"
   ],
-  "sitemap_uncompressed_bytes": 5975578,
-  "sitemap_stored_bytes": 655777,
-  "sitemap_lossless_bytes_saved": 5319801
+  "sitemap_uncompressed_bytes": 5975723,
+  "sitemap_stored_bytes": 655798,
+  "sitemap_lossless_bytes_saved": 5319925
 }
