@@ -1,17 +1,17 @@
 {
   "schema": "hadith-bank-discovery-v1",
-  "record_pages": 41068,
+  "record_pages": 41121,
   "shared_reader_occurrences": 73789,
-  "index_pages": 1482,
-  "indexable_pages": 42550,
-  "generated_files": 43240,
-  "generated_bytes": 499111423,
-  "site_bytes": 930365236,
-  "source_records_sha256": "582894e9c5b4e1bc87a25fe08486d9eb8837220f662c64506d16336bdd546299",
+  "index_pages": 1496,
+  "indexable_pages": 42617,
+  "generated_files": 43308,
+  "generated_bytes": 499588638,
+  "site_bytes": 931101177,
+  "source_records_sha256": "bafe4fe6993cec7b36cf27794c27a15d6bed56e15be4f386890a168820bb60fa",
   "source_texts_unchanged": true,
   "independent_qc_performed": false,
-  "static_record_pages_dom_verified": 41068,
-  "static_record_body_bytes_saved": 7956062,
+  "static_record_pages_dom_verified": 41121,
+  "static_record_body_bytes_saved": 7965460,
   "complete_source_views": {
     "provider_occurrences": 36464,
     "original_source_pages": 238,
@@ -22,39 +22,39 @@
     "included_in_narration_search": false
   },
   "shared_translation_provenance": {
-    "shared_metadata_pages": 78,
-    "actual_inline_provenance_bytes_saved": 19818136,
-    "actual_shared_metadata_asset_bytes": 249384,
-    "actual_net_shared_provenance_bytes_saved": 19568752
+    "shared_metadata_pages": 79,
+    "actual_inline_provenance_bytes_saved": 19842538,
+    "actual_shared_metadata_asset_bytes": 252818,
+    "actual_net_shared_provenance_bytes_saved": 19589720
   },
   "languages": {
     "ar": 32267,
-    "bn": 44,
+    "bn": 55,
     "bs": 3,
     "de": 3,
     "en": 3684,
     "fa": 14382,
     "fil": 2354,
-    "hi": 33044,
+    "hi": 33083,
     "ja": 3520,
     "ms": 147,
     "pt": 8,
-    "ur": 231,
+    "ur": 234,
     "uz": 9780,
     "vi": 4555,
     "zh-CN": 10835
   },
   "language_count": 15,
-  "book_language_count": 132,
-  "edition_count": 264,
+  "book_language_count": 137,
+  "edition_count": 272,
   "sitemap_count": 2,
-  "sitemap_url_count": 42551,
+  "sitemap_url_count": 42618,
   "sitemap": "https://blaghtayt-alt.github.io/Hadith-Bank/sitemap.xml",
   "sitemap_original_xml_sha256": [
-    "6ec6f3a86f4188b2e192282e7c37204da1bf56cf9c99ca690e90d61b214d66f0",
-    "0d518cc101e4cb840809203329a34895b08e1d33937999260f2a8b813993c0f4"
+    "04c1e07498a96b6e9eff309114d0d81e91e96c0e7d4efe1a76b1230ab973bff8",
+    "d8967b50af398093205597708231f599a0e1467e23a99e286b7a1c08ae7b40db"
   ],
-  "sitemap_uncompressed_bytes": 5965643,
-  "sitemap_stored_bytes": 654415,
-  "sitemap_lossless_bytes_saved": 5311228
+  "sitemap_uncompressed_bytes": 5975578,
+  "sitemap_stored_bytes": 655777,
+  "sitemap_lossless_bytes_saved": 5319801
 }
