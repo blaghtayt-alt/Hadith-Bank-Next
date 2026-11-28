@@ -1,17 +1,17 @@
 {
   "schema": "hadith-bank-discovery-v1",
-  "record_pages": 41122,
+  "record_pages": 41124,
   "shared_reader_occurrences": 73789,
   "index_pages": 1496,
-  "indexable_pages": 42618,
-  "generated_files": 43309,
-  "generated_bytes": 499596209,
-  "site_bytes": 931112524,
-  "source_records_sha256": "a25c6c651f7be3a9dbb924765753bb2d7406a23b13122a5bb4a72aaf29b51ec5",
+  "indexable_pages": 42620,
+  "generated_files": 43311,
+  "generated_bytes": 499614968,
+  "site_bytes": 931151109,
+  "source_records_sha256": "3d1d82ee333a9c1dc866a60e6dd05406acb470574ed3789ebe7d5d7547834132",
   "source_texts_unchanged": true,
   "independent_qc_performed": false,
-  "static_record_pages_dom_verified": 41122,
-  "static_record_body_bytes_saved": 7965698,
+  "static_record_pages_dom_verified": 41124,
+  "static_record_body_bytes_saved": 7966088,
   "complete_source_views": {
     "provider_occurrences": 36464,
     "original_source_pages": 238,
@@ -23,9 +23,9 @@
   },
   "shared_translation_provenance": {
     "shared_metadata_pages": 79,
-    "actual_inline_provenance_bytes_saved": 19842538,
+    "actual_inline_provenance_bytes_saved": 19843977,
     "actual_shared_metadata_asset_bytes": 252818,
-    "actual_net_shared_provenance_bytes_saved": 19589720
+    "actual_net_shared_provenance_bytes_saved": 19591159
   },
   "languages": {
     "ar": 32267,
@@ -35,7 +35,7 @@
     "en": 3684,
     "fa": 14382,
     "fil": 2354,
-    "hi": 33083,
+    "hi": 33085,
     "ja": 3520,
     "ms": 147,
     "pt": 8,
@@ -48,13 +48,13 @@
   "book_language_count": 137,
   "edition_count": 272,
   "sitemap_count": 2,
-  "sitemap_url_count": 42619,
+  "sitemap_url_count": 42621,
   "sitemap": "https://blaghtayt-alt.github.io/Hadith-Bank/sitemap.xml",
   "sitemap_original_xml_sha256": [
-    "5cc9914c785960ea195e5aa6b3a28b2f6fd0e105e54af2ec98c55d0c6944f91d",
-    "6a36098fa6d1cef6da40aeffe28fa23f90e4320e1d22d8e8fdcc66a950001022"
+    "c588f6b14e53ebaf6dc4743f437b3cbd72a46c2deffdaaed190888c70fcaed19",
+    "e5b255fe865f104f5a0de7574a07b5dd91396517509f099d2d7fba44ccb3c792"
   ],
-  "sitemap_uncompressed_bytes": 5975723,
-  "sitemap_stored_bytes": 655798,
-  "sitemap_lossless_bytes_saved": 5319925
+  "sitemap_uncompressed_bytes": 5976055,
+  "sitemap_stored_bytes": 655832,
+  "sitemap_lossless_bytes_saved": 5320223
 }
